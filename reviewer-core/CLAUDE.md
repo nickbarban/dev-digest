@@ -29,4 +29,4 @@ pnpm build    # typecheck only; JS не емітується
 - Повна схема pipeline → [README.md](README.md)
 - Prompt assembly або injection hardening → [README.md](README.md)
 - Додаєш новий prompt-слот → [docs/](docs/)
-- Дизайн-рішення, які не видно з коду → [insights](insights)
+- Дизайн-рішення, які не видно з коду → [insights.md](insights.md)

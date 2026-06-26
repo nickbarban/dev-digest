@@ -14,3 +14,4 @@ pnpm test   # потрібен повний стек: Postgres + API :3001 + web
 ## Read when
 - API драйвера agent-browser → [README.md](README.md)
 - Які flow вже покриті → [specs/](specs/)
+- Дивна поведінка тестів → [insights.md](insights.md)

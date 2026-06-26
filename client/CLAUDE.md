@@ -30,4 +30,4 @@ pnpm typecheck
 - Маршрути і які API вони використовують → [README.md](README.md)
 - Додаєш новий екран → [README.md](README.md)
 - Специфікація фічі → [specs/](specs/)
-- Дивна поведінка UI → [insights](insights)
+- Дивна поведінка UI → [insights.md](insights.md)
