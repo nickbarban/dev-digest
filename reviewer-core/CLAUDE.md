@@ -4,29 +4,29 @@ Pure review engine: diff → prompt → LLM → grounded findings.
 
 ## Commands
 ```sh
-pnpm test     # vitest з MockLLMProvider — реального LLM-виклику немає
-pnpm build    # typecheck only; JS не емітується
+pnpm test     # vitest with MockLLMProvider — no real LLM call
+pnpm build    # typecheck only; no JS emitted
 ```
 
 ## Critical constraints
-- **Немає DB, GitHub, filesystem** — єдиний side effect = ін'єктований `LLMProvider`
-- **Немає JS build** — споживається через tsconfig path alias напряму як TypeScript
-- **Grounding gate обов'язковий і безумовний** — `groundFindings()` запускається
-  після КОЖНОЇ стратегії; ніколи не пропускати
-- **Score рахується з тих findings, що пройшли gate** — не довіряй числу від моделі;
-  авторитет — `scoreFromFindings(ground.kept)`
+- **No DB, GitHub, or filesystem** — the only side effect is the injected `LLMProvider`
+- **No JS build** — consumed via tsconfig path alias directly as TypeScript
+- **Grounding gate is mandatory and unconditional** — `groundFindings()` runs
+  after EVERY strategy; never skip it
+- **Score is computed from findings that passed the gate** — do not trust the model's number;
+  authority is `scoreFromFindings(ground.kept)`
 
 ## Pipeline
 `assemblePrompt()` → LLM call(s) → `reduceReviews()` → `groundFindings()` → `ReviewOutcome`
 
 ## Non-default conventions
-- Весь untrusted контент (prDescription, specs, repoMap) проходить через `wrapUntrusted()`
-- map-reduce спрацьовує тільки коли diff > 400 рядків І > 1 файл (обидві умови)
-- Слоти `ReviewInput` (skills, memory, specs, callers) — resolved strings; caller
-  резолвить slugs → bodies ДО виклику engine
+- All untrusted content (prDescription, specs, repoMap) goes through `wrapUntrusted()`
+- map-reduce triggers only when diff > 400 lines AND > 1 file (both conditions)
+- `ReviewInput` slots (skills, memory, specs, callers) — resolved strings; caller
+  resolves slugs → bodies BEFORE calling the engine
 
 ## Read when
-- Повна схема pipeline → [README.md](README.md)
-- Prompt assembly або injection hardening → [README.md](README.md)
-- Додаєш новий prompt-слот → [docs/](docs/)
-- Дизайн-рішення, які не видно з коду → [insights.md](insights.md)
+- Full pipeline diagram → [README.md](README.md)
+- Prompt assembly or injection hardening → [README.md](README.md)
+- Adding a new prompt slot → [docs/](docs/)
+- Design decisions not visible from code → [insights.md](insights.md)

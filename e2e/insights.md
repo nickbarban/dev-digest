@@ -1,4 +1,4 @@
 # e2e/ — insights
 
-Тут фіксуються лише факти, які не виводяться з коду: підводні камені, неочевидні рішення,
-дивна поведінка, яку знайшли під час роботи. Перед записом — перечитати, щоб не дублювати.
+Only record facts that cannot be inferred from code: pitfalls, non-obvious decisions,
+odd behavior discovered during work. Re-read before adding entries to avoid duplication.
