@@ -74,3 +74,16 @@ describe("RunHistory — outcome badge", () => {
     expect(screen.getByText("running")).toBeInTheDocument();
   });
 });
+
+describe("RunHistory — cost badge", () => {
+  it("shows cost when cost_usd is set on a completed run", () => {
+    renderRuns([run({ status: "done", cost_usd: 0.014 })]);
+    expect(screen.getByText("$0.014")).toBeInTheDocument();
+  });
+
+  it("hides cost (no '—' placeholder) when cost_usd is null", () => {
+    renderRuns([run({ status: "done", cost_usd: null })]);
+    expect(screen.queryByText("$")).toBeNull();
+    expect(screen.queryByText("—")).toBeNull();
+  });
+});
