@@ -30,6 +30,7 @@ function run(o: Partial<RunSummary>): RunSummary {
     ran_at: "2026-06-11T18:44:34.000Z",
     score: null,
     blockers: null,
+    cost_usd: null,
     ...o,
   };
 }
@@ -71,5 +72,18 @@ describe("RunHistory — outcome badge", () => {
   it("a running run reads 'running'", () => {
     renderRuns([run({ status: "running", score: null, blockers: null })]);
     expect(screen.getByText("running")).toBeInTheDocument();
+  });
+});
+
+describe("RunHistory — cost badge", () => {
+  it("shows cost when cost_usd is set on a completed run", () => {
+    renderRuns([run({ status: "done", cost_usd: 0.014 })]);
+    expect(screen.getByText("$0.014")).toBeInTheDocument();
+  });
+
+  it("hides cost (no '—' placeholder) when cost_usd is null", () => {
+    renderRuns([run({ status: "done", cost_usd: null })]);
+    expect(screen.queryByText("$")).toBeNull();
+    expect(screen.queryByText("—")).toBeNull();
   });
 });
