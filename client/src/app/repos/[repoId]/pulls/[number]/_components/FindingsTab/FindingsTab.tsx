@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useCallback } from "react";
-import { Icon, Badge, Button, SectionLabel, EmptyState } from "@devdigest/ui";
+import { Icon, Badge, Button, SectionLabel, EmptyState, type Severity } from "@devdigest/ui";
 import { RunStatus } from "../RunStatus";
 import { RunHistory } from "../RunHistory/RunHistory";
 import { ReviewRunAccordion } from "../ReviewRunAccordion";
+import { SeverityFilterBar } from "../SeverityFilterBar";
 import { s } from "./styles";
 import type { FindingRecord, ReviewRecord, RunSummary, PrCommit } from "@devdigest/shared";
 import type { UseMutationResult } from "@tanstack/react-query";
@@ -70,6 +71,21 @@ export function FindingsTab({
   const handleGoToReview = useCallback((runId: string) => {
     setTarget((p) => ({ runId, n: (p?.n ?? 0) + 1 }));
   }, []);
+
+  // Severity filter across all runs: clicking a severity narrows "Review
+  // runs" down to just its findings; clicking the active one again clears it.
+  const [activeSeverity, setActiveSeverity] = React.useState<Severity | null>(null);
+  const handleToggleSeverity = useCallback((sev: Severity) => {
+    setActiveSeverity((prev) => (prev === sev ? null : sev));
+  }, []);
+  const allFindings = React.useMemo(() => runs.flatMap((r) => r.findings), [runs]);
+  const visibleRuns = React.useMemo(
+    () =>
+      activeSeverity
+        ? runs.filter((r) => r.findings.some((f) => f.severity === activeSeverity))
+        : runs,
+    [runs, activeSeverity],
+  );
 
   return (
     <section>
@@ -144,6 +160,13 @@ export function FindingsTab({
       >
         Review runs
       </SectionLabel>
+      {runs.length > 0 && (
+        <SeverityFilterBar
+          findings={allFindings}
+          active={activeSeverity}
+          onToggle={handleToggleSeverity}
+        />
+      )}
       {runs.length === 0 ? (
         reviewRunning || liveRunIds.length > 0 ? null : (
           <EmptyState
@@ -152,9 +175,15 @@ export function FindingsTab({
             body="Run a review to generate findings. Use Run Review ▾ above (run all enabled agents or a specific one)."
           />
         )
+      ) : visibleRuns.length === 0 ? (
+        <EmptyState
+          icon="Filter"
+          title={`No ${activeSeverity?.toLowerCase()} findings`}
+          body="Click the severity again to clear the filter."
+        />
       ) : (
         prId &&
-        runs.map((review, i) => (
+        visibleRuns.map((review, i) => (
           <ReviewRunAccordion
             key={review.id}
             review={review}
@@ -164,6 +193,7 @@ export function FindingsTab({
             headSha={headSha}
             targetRunId={target?.runId ?? null}
             targetNonce={target?.n ?? 0}
+            severityFilter={activeSeverity}
           />
         ))
       )}

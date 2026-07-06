@@ -11,6 +11,7 @@ odd behavior discovered during work. Re-read before adding entries to avoid dupl
 
 - 2026-07-02 — PR list table columns are driven by TWO separate constants that must stay in sync: `GRID` (CSS grid template) and `COLUMN_KEYS` (header labels array). Adding a column without updating both breaks the layout silently — cells shift out of alignment. (`client/src/app/repos/[repoId]/pulls/constants.ts`)
 - 2026-07-02 — The header row uses `s.headCell(i === COLUMN_KEYS.length - 1)` to right-align only the last column. When adding a second right-aligned column before it, change the condition to `i >= COLUMN_KEYS.length - 2` (or key-based check). (`client/src/app/repos/[repoId]/pulls/page.tsx:101`)
+- 2026-07-06 — The PR detail tab labeled "Agent runs" in the UI is keyed internally as `tab === "findings"` (the `?tab=` query value), not "runs"/"agent-runs" — grepping for the visible label won't find its tab logic. (`client/src/app/repos/[repoId]/pulls/[number]/page.tsx:60,139`, label in `PrDetailHeader.tsx:117`)
 
 ## Tool & Library Notes
 
