@@ -220,6 +220,42 @@ export async function seed(db: Db): Promise<{ workspaceId: string; userId: strin
     if (!existing) await db.insert(t.agents).values(a);
   }
 
+  // ---- backfill: attach the sample review (above) to a synthetic run ----
+  // The sample review has no agent_id/run_id, so it only ever shows in
+  // "Review Runs", never in the Timeline (which lists agent_runs). Give it
+  // one, idempotently and outside the `if (!pr)` guard above, so this also
+  // backfills databases that were already seeded before this existed.
+  const [security] = await db
+    .select()
+    .from(t.agents)
+    .where(and(eq(t.agents.workspaceId, workspaceId), eq(t.agents.name, 'Security Reviewer')));
+  const [sampleReview] = await db
+    .select()
+    .from(t.reviews)
+    .where(and(eq(t.reviews.prId, pr!.id), eq(t.reviews.model, 'seed')));
+  if (sampleReview && !sampleReview.runId && security) {
+    const [agentRun] = await db
+      .insert(t.agentRuns)
+      .values({
+        workspaceId,
+        prId: pr!.id,
+        agentId: security.id,
+        provider: DEFAULT_PROVIDER,
+        model: DEFAULT_MODEL,
+        status: 'done',
+        source: 'local',
+        findingsCount: 2,
+        score: sampleReview.score,
+        blockers: 1,
+        ranAt: new Date(),
+      })
+      .returning();
+    await db
+      .update(t.reviews)
+      .set({ runId: agentRun!.id, agentId: security.id })
+      .where(eq(t.reviews.id, sampleReview.id));
+  }
+
   return { workspaceId, userId };
 }
 

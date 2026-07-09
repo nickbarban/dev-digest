@@ -79,6 +79,10 @@ export function FindingsTab({
     setActiveSeverity((prev) => (prev === sev ? null : sev));
   }, []);
   const allFindings = React.useMemo(() => runs.flatMap((r) => r.findings), [runs]);
+  const findingsByRunId = React.useMemo(
+    () => new Map(runs.filter((r) => r.run_id).map((r) => [r.run_id as string, r.findings])),
+    [runs],
+  );
   const visibleRuns = React.useMemo(
     () =>
       activeSeverity
@@ -147,6 +151,9 @@ export function FindingsTab({
           <RunHistory
             runs={prRuns ?? []}
             commits={prCommits}
+            findingsByRunId={findingsByRunId}
+            repoFullName={repoFullName}
+            headSha={headSha}
             onOpenTrace={handleOpenTrace}
             onGoToReview={handleGoToReview}
             onDelete={handleDelete}

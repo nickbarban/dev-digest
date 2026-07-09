@@ -113,8 +113,7 @@ export default async function pullsRoutes(appBase: FastifyInstance) {
 
     // Latest-review SCORE per PR for the list's score ring. Computed on read
     // from reviews (no FK denorm); the list is small, so one IN-query + JS
-    // grouping is cheap. (The per-severity FINDINGS breakdown is intentionally
-    // not surfaced on the list — findings live on the PR detail page.)
+    // grouping is cheap.
     const prIds = rows.map((r) => r.id);
     const latestReviewByPr = new Map<string, { score: number | null }>();
     if (prIds.length > 0) {
@@ -139,6 +138,28 @@ export default async function pullsRoutes(appBase: FastifyInstance) {
         .groupBy(t.agentRuns.prId);
       for (const row of costRows) {
         if (row.prId) totalCostByPr.set(row.prId, row.total !== null ? Number(row.total) : null);
+      }
+    }
+
+    // Per-severity FINDINGS counts per PR, for the list's findings column.
+    // `findings` has no pr_id column, only review_id, so it's joined through
+    // reviews; same cheap IN-query + JS grouping as score/cost above. Counts
+    // are raw (not filtered by accepted/dismissed) to match the detail page's
+    // severity filter bar.
+    type FindingCounts = { critical: number; warning: number; suggestion: number };
+    const findingsByPr = new Map<string, FindingCounts>();
+    if (prIds.length > 0) {
+      const findingRows = await container.db
+        .select({ prId: t.reviews.prId, severity: t.findings.severity })
+        .from(t.findings)
+        .innerJoin(t.reviews, eq(t.findings.reviewId, t.reviews.id))
+        .where(inArray(t.reviews.prId, prIds));
+      for (const row of findingRows) {
+        const counts = findingsByPr.get(row.prId) ?? { critical: 0, warning: 0, suggestion: 0 };
+        if (row.severity === 'CRITICAL') counts.critical++;
+        else if (row.severity === 'WARNING') counts.warning++;
+        else if (row.severity === 'SUGGESTION') counts.suggestion++;
+        findingsByPr.set(row.prId, counts);
       }
     }
 
@@ -167,6 +188,9 @@ export default async function pullsRoutes(appBase: FastifyInstance) {
         updated_at: r.updatedAt?.toISOString() ?? null,
         score: review ? review.score : null,
         cost_usd: totalCostByPr.get(r.id) ?? null,
+        findings_critical: findingsByPr.get(r.id)?.critical ?? 0,
+        findings_warning: findingsByPr.get(r.id)?.warning ?? 0,
+        findings_suggestion: findingsByPr.get(r.id)?.suggestion ?? 0,
       };
     });
   });
