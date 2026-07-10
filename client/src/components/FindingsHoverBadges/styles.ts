@@ -7,8 +7,13 @@ export const s = {
   panel: {
     position: "absolute",
     top: "calc(100% + 8px)",
-    left: 0,
+    // Anchored to the right (not left) edge of the trigger: both call sites
+    // (PR list "findings" column, Timeline row) have their wide content — the
+    // `1fr` title column / flex-1 text — to the left, so the panel expands
+    // into that space instead of clipping at the viewport's right edge.
+    right: 0,
     width: 380,
+    maxWidth: "calc(100vw - 32px)",
     maxHeight: 360,
     overflowY: "auto",
     background: "var(--bg-elevated)",
