@@ -6,7 +6,7 @@
 "use client";
 
 import React from "react";
-import { Icon, Badge } from "@devdigest/ui";
+import { Icon, Badge, type Severity } from "@devdigest/ui";
 import type { ReviewRecord, Verdict } from "@devdigest/shared";
 import { FindingsPanel } from "../FindingsPanel";
 import { VerdictBanner } from "../VerdictBanner";
@@ -31,6 +31,7 @@ export function ReviewRunAccordion({
   headSha,
   targetRunId = null,
   targetNonce = 0,
+  severityFilter = null,
 }: {
   review: ReviewRecord;
   prId: string;
@@ -41,6 +42,8 @@ export function ReviewRunAccordion({
    *  (driven from the Timeline: clicking an agent name navigates here). */
   targetRunId?: string | null;
   targetNonce?: number;
+  /** When set, only this severity's findings are shown (via SeverityFilterBar). */
+  severityFilter?: Severity | null;
 }) {
   const [open, setOpen] = React.useState(defaultOpen);
   const rootRef = React.useRef<HTMLDivElement | null>(null);
@@ -51,9 +54,18 @@ export function ReviewRunAccordion({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetRunId, targetNonce, review.run_id]);
+  // A severity filter should surface this run's matches immediately, without
+  // requiring an extra click to expand — the user can still collapse it back.
+  React.useEffect(() => {
+    if (severityFilter) setOpen(true);
+  }, [severityFilter]);
   const del = useDeleteReview(prId);
-  const findings = review.findings;
-  const blockers = findings.filter((f) => f.severity === "CRITICAL" && !f.dismissed_at).length;
+  const findings = severityFilter
+    ? review.findings.filter((f) => f.severity === severityFilter)
+    : review.findings;
+  // Blocker count reflects the review's real state, not the current display
+  // filter — filtering to WARNING shouldn't make CRITICAL blockers disappear.
+  const blockers = review.findings.filter((f) => f.severity === "CRITICAL" && !f.dismissed_at).length;
   const verdictColor = review.verdict ? VERDICT_COLOR[review.verdict] ?? "var(--text-muted)" : "var(--text-muted)";
 
   return (
@@ -141,7 +153,7 @@ export function ReviewRunAccordion({
                 verdict={review.verdict as Verdict}
                 summary={review.summary}
                 score={review.score}
-                findingsCount={findings.length}
+                findingsCount={review.findings.length}
                 blockers={blockers}
                 agentName={review.agent_name}
               />

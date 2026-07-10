@@ -5,9 +5,9 @@
  * and shows the review score ring.
  */
 import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
-import type { RunSummary } from "@devdigest/shared";
+import type { RunSummary, FindingRecord } from "@devdigest/shared";
 import messages from "../../../../../../../../messages/en/prReview.json";
 import { RunHistory } from "./RunHistory";
 
@@ -35,10 +35,31 @@ function run(o: Partial<RunSummary>): RunSummary {
   };
 }
 
-function renderRuns(runs: RunSummary[]) {
+function finding(severity: FindingRecord["severity"], id: string, title: string): FindingRecord {
+  return {
+    id,
+    severity,
+    category: "security",
+    title,
+    file: "src/config.ts",
+    start_line: 12,
+    end_line: 12,
+    rationale: "A live secret is committed in source.",
+    suggestion: null,
+    confidence: 0.9,
+    kind: "finding",
+    trifecta_components: null,
+    evidence: null,
+    review_id: "r1",
+    accepted_at: null,
+    dismissed_at: null,
+  };
+}
+
+function renderRuns(runs: RunSummary[], findingsByRunId?: Map<string, FindingRecord[]>) {
   return render(
     <NextIntlClientProvider locale="en" messages={{ prReview: messages }}>
-      <RunHistory runs={runs} onOpenTrace={() => {}} />
+      <RunHistory runs={runs} findingsByRunId={findingsByRunId} onOpenTrace={() => {}} />
     </NextIntlClientProvider>,
   );
 }
@@ -81,9 +102,30 @@ describe("RunHistory — cost badge", () => {
     expect(screen.getByText("$0.014")).toBeInTheDocument();
   });
 
-  it("hides cost (no '—' placeholder) when cost_usd is null", () => {
+  it("hides cost (no RunCostBadge rendered) when cost_usd is null", () => {
+    // Note: the row can still show a "—" placeholder from the unrelated
+    // findings badges (zero findings on this run) — that's not a cost badge.
     renderRuns([run({ status: "done", cost_usd: null })]);
     expect(screen.queryByText("$")).toBeNull();
-    expect(screen.queryByText("—")).toBeNull();
+  });
+});
+
+describe("RunHistory — per-run findings badges", () => {
+  it("shows a popover with that run's individual findings on hover", () => {
+    const findingsByRunId = new Map([
+      ["run-1", [finding("CRITICAL", "f1", "Hardcoded Stripe secret key"), finding("WARNING", "f2", "N+1 query")]],
+    ]);
+    const { container } = renderRuns([run({ status: "done" })], findingsByRunId);
+    const badgesWrap = container.querySelector('[style*="position: relative"]');
+    expect(badgesWrap).not.toBeNull();
+    fireEvent.mouseEnter(badgesWrap!);
+    expect(screen.getByText("2 findings")).toBeInTheDocument();
+    expect(screen.getByText("Hardcoded Stripe secret key")).toBeInTheDocument();
+    expect(screen.getByText("N+1 query")).toBeInTheDocument();
+  });
+
+  it("shows a muted dash when the run has no findings", () => {
+    renderRuns([run({ status: "done" })]);
+    expect(screen.getByText("—")).toBeInTheDocument();
   });
 });
