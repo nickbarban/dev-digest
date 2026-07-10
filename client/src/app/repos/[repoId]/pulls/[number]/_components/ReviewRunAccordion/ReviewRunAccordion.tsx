@@ -63,7 +63,9 @@ export function ReviewRunAccordion({
   const findings = severityFilter
     ? review.findings.filter((f) => f.severity === severityFilter)
     : review.findings;
-  const blockers = findings.filter((f) => f.severity === "CRITICAL" && !f.dismissed_at).length;
+  // Blocker count reflects the review's real state, not the current display
+  // filter — filtering to WARNING shouldn't make CRITICAL blockers disappear.
+  const blockers = review.findings.filter((f) => f.severity === "CRITICAL" && !f.dismissed_at).length;
   const verdictColor = review.verdict ? VERDICT_COLOR[review.verdict] ?? "var(--text-muted)" : "var(--text-muted)";
 
   return (
@@ -151,7 +153,7 @@ export function ReviewRunAccordion({
                 verdict={review.verdict as Verdict}
                 summary={review.summary}
                 score={review.score}
-                findingsCount={findings.length}
+                findingsCount={review.findings.length}
                 blockers={blockers}
                 agentName={review.agent_name}
               />
