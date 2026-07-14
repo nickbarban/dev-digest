@@ -30,6 +30,11 @@ cd server && pnpm db:migrate  # REQUIRED on first run
   after pulling schema changes
 - **Secrets live in `~/.devdigest/secrets.json`**, not in `.env` or the DB;
   the only read path is `server/src/adapters/secrets/local.ts`
+- **PRs always target `nickbarban/dev-digest`**, not the `upstream` remote
+  (`burnjohn/dev-digest`) — `gh pr create` defaults to `upstream` when both
+  remotes exist, which opens the PR against the wrong repo. Use
+  `gh repo set-default nickbarban/dev-digest` once per clone, or pass
+  `--repo nickbarban/dev-digest` explicitly.
 
 ## Read when
 - Touching server internals → read [server/README.md](server/README.md)
