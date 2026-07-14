@@ -41,5 +41,11 @@
     "viewOnGitHub": "View on GitHub",
     "postedToGitHub": "Posts to GitHub immediately",
     "outdatedTitle": "{count} comment(s) on older revisions"
+  },
+  "diffTab": {
+    "showComments": "Show comments",
+    "hideComments": "Hide comments",
+    "filesChanged": "Files changed · {count} files",
+    "postError": "Couldn't post the comment to GitHub."
   }
 }

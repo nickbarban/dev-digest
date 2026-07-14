@@ -8,7 +8,7 @@ import { Badge } from "@devdigest/ui";
 import type { RunTrace, FindingRecord } from "@devdigest/shared";
 import { PROMPT_COLORS } from "../../constants";
 import { formatSeconds, formatTokens } from "../../helpers";
-import { formatCost } from "@/components/RunCostBadge/RunCostBadge";
+import { formatCost } from "@/components/run-cost-badge";
 import { s } from "../../styles";
 import { TraceSection } from "../TraceSection";
 import { ToolCallRow } from "../ToolCallRow";

@@ -111,5 +111,28 @@
     "goToReview": "Jump to this run’s findings below",
     "openTrace": "Open run trace & logs",
     "deleteRun": "Delete run"
+  },
+  "findingsTab": {
+    "liveReview": "Live review",
+    "cancel": "Cancel",
+    "openRunTrace": "Open run trace",
+    "reviewInProgress": "Review in progress…",
+    "reviewInProgressSub": "the agent is analyzing the diff — this can take a while on large PRs.",
+    "lethalTrifectaDetected": "Lethal Trifecta detected",
+    "timelineSubtitle": "runs & commits · newest first",
+    "timeline": "Timeline",
+    "reviewRunsSubtitle": "grouped by run · newest first",
+    "reviewRuns": "Review runs",
+    "emptyTitle": "No findings yet",
+    "emptyBody": "Run a review to generate findings. Use Run Review ▾ above (run all enabled agents or a specific one).",
+    "noSeverityFindingsTitle": "No {severity} findings",
+    "noSeverityFindingsBody": "Click the severity again to clear the filter."
+  },
+  "header": {
+    "viewOnGitHub": "View on GitHub",
+    "staleBanner": "This PR is already {status} — running a review is informational and won't affect the merged code.",
+    "tabOverview": "Overview",
+    "tabAgentRuns": "Agent runs",
+    "tabFilesChanged": "Files changed"
   }
 }

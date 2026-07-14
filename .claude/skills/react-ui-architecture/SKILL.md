@@ -87,7 +87,7 @@ This is about *file location* only — for the hooks-for-business-logic rule its
 ## Barrel Files & Naming Conventions (MEDIUM)
 
 - Every component folder gets an `index.ts` barrel; consumers import the folder path, never `ComponentName.tsx` directly
-- Barrel form: `export { X, X as default } from "./X";`
+- Barrel form: `export { X } from "./X";` — add `X as default` only when something actually default-imports it (most consumers use the named import; don't add a default re-export "just in case")
 - Route/group folders (`app/<feature>/`, `components/<feature-group>/`) are lowercase-kebab; individual component folders are PascalCase matching the exported component name
 - Inside a file: imports → constants → helpers → component → exports — see `react-best-practices`' File Quality rule, not restated here
 

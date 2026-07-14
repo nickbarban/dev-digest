@@ -36,6 +36,10 @@ This skill deliberately does not restate rules already owned by the two skills a
 
 ## Version
 
+**1.1.0** — 2026-07-14
+
+- Relaxed the barrel default-export rule: `X as default` is now opt-in (only when something actually default-imports the barrel), not mandatory on every `index.ts` — the mandatory form didn't match how ~18 existing barrels were actually written, and forcing it added a re-export nobody used.
+
 **1.0.0** — 2026-07-14
 
 - Initial version, derived from this repo's actual `client/src/` conventions (verified against `AgentCard/`, `AgentEditor/_components/ConfigTab/`, `diff-viewer/`, `lib/hooks/`) plus the external research below.

@@ -7,8 +7,7 @@ import React from "react";
 import { Chip, SEV, type Severity } from "@devdigest/ui";
 import type { FindingRecord } from "@devdigest/shared";
 import { s } from "./styles";
-
-const SEVERITIES: Severity[] = ["CRITICAL", "WARNING", "SUGGESTION"];
+import { SEVERITIES } from "./constants";
 
 export function SeverityFilterBar({
   findings,
