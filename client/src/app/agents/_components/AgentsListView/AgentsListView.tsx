@@ -5,7 +5,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Button, Dropdown, EmptyState, ErrorState, Skeleton, Icon } from "@devdigest/ui";
+import { Button, Dropdown, EmptyState, ErrorState, Skeleton, Icon, TextInput } from "@devdigest/ui";
 import { AppShell } from "../../../../components/app-shell";
 import { useAgents, useUpdateAgent } from "../../../../lib/hooks/agents";
 import { AgentCard } from "../AgentCard";
@@ -34,12 +34,11 @@ export function AgentsListView() {
             <p style={s.subtitle}>{t("list.subtitle")}</p>
           </div>
           <div style={s.search}>
-            <Icon.Search size={13} style={s.searchIcon} />
-            <input
+            <TextInput
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={setSearch}
               placeholder={t("list.searchPlaceholder")}
-              style={s.searchInput}
+              suffix={<Icon.Search size={13} style={s.searchIcon} />}
             />
           </div>
           <Dropdown

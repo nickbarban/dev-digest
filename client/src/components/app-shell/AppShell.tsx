@@ -10,10 +10,14 @@ import { useGlobalShortcuts, useShellCommands, useShellContext } from "./hooks";
 export function AppShell({ children, crumb }: { children: React.ReactNode; crumb?: Crumb[] }) {
   const [paletteOpen, setPaletteOpen] = React.useState(false);
   const [helpOpen, setHelpOpen] = React.useState(false);
+  // Stable identity matters for these two: useGlobalShortcuts depends on them
+  // inside a useEffect (window keydown listener) and useShellContext depends
+  // on openPalette inside a useMemo — an unstable reference would re-bind the
+  // listener / rebuild the context object on every render.
   const openPalette = React.useCallback(() => setPaletteOpen(true), []);
-  const closePalette = React.useCallback(() => setPaletteOpen(false), []);
   const openHelp = React.useCallback(() => setHelpOpen(true), []);
-  const closeHelp = React.useCallback(() => setHelpOpen(false), []);
+  const closePalette = () => setPaletteOpen(false);
+  const closeHelp = () => setHelpOpen(false);
 
   useGlobalShortcuts({ onOpenPalette: openPalette, onOpenHelp: openHelp });
   const commands = useShellCommands();

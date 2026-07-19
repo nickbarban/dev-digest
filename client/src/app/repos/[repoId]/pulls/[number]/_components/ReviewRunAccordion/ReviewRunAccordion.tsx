@@ -10,18 +10,9 @@ import { Icon, Badge, type Severity } from "@devdigest/ui";
 import type { ReviewRecord, Verdict } from "@devdigest/shared";
 import { FindingsPanel } from "../FindingsPanel";
 import { VerdictBanner } from "../VerdictBanner";
-import { useDeleteReview } from "../../../../../../../lib/hooks/reviews";
-
-const VERDICT_COLOR: Record<string, string> = {
-  request_changes: "var(--crit)",
-  comment: "var(--warn)",
-  approve: "var(--ok)",
-};
-
-function formatWhen(iso: string): string {
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? iso : d.toLocaleString();
-}
+import { useDeleteReview } from "@/lib/hooks/reviews";
+import { VERDICT_COLOR } from "./constants";
+import { formatWhen } from "./helpers";
 
 export function ReviewRunAccordion({
   review,

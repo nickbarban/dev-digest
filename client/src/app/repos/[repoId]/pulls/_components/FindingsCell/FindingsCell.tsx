@@ -8,7 +8,7 @@ import React from "react";
 import type { PrMeta } from "@/lib/types";
 import { usePrReviews } from "@/lib/hooks/reviews";
 import { useActiveRepo } from "@/lib/repo-context";
-import { FindingsHoverBadges } from "@/components/FindingsHoverBadges";
+import { FindingsHoverBadges } from "@/components/findings-hover-badges";
 
 export function FindingsCell({ pr }: { pr: PrMeta }) {
   const { activeRepo } = useActiveRepo();

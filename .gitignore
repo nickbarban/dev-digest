@@ -23,3 +23,7 @@ test-results/
 
 # emdash worktree config (local)
 .emdash.json
+
+# pr-self-review local state (per-checkout, not shared)
+.claude/.pr-self-review-receipt.json
+.claude/.pr-self-review-cache.json

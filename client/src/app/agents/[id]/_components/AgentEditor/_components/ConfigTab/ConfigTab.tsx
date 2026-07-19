@@ -10,7 +10,12 @@ import { toModelOptions } from "../../../../../../../lib/model-label";
 import { CI_FAIL_ON_VALUES, OUTPUT_SCHEMA_VALUE, PROVIDER_OPTIONS, STRATEGY_VALUES } from "./constants";
 import { s } from "./styles";
 
-/** Config tab — name/description/provider/model/system-prompt + enabled toggle. */
+/**
+ * Config tab — name/description/provider/model/system-prompt + enabled toggle.
+ * The form state below only initializes from `agent` on mount; switching
+ * agents relies on the parent keying this component by `agent.id` (see
+ * AgentEditor.tsx) to force a remount instead of an effect-driven reset.
+ */
 export function ConfigTab({ agent }: { agent: Agent }) {
   const t = useTranslations("agents");
   const toast = useToast();
@@ -24,19 +29,6 @@ export function ConfigTab({ agent }: { agent: Agent }) {
   const [ciFailOn, setCiFailOn] = React.useState<CiFailOn>(agent.ci_fail_on);
   const [repoIntel, setRepoIntel] = React.useState(agent.repo_intel);
   const [enabled, setEnabled] = React.useState(agent.enabled);
-
-  // Reset local form when switching agents.
-  React.useEffect(() => {
-    setName(agent.name);
-    setDescription(agent.description);
-    setProvider(agent.provider);
-    setModel(agent.model);
-    setSystemPrompt(agent.system_prompt);
-    setStrategy(agent.strategy);
-    setCiFailOn(agent.ci_fail_on);
-    setRepoIntel(agent.repo_intel);
-    setEnabled(agent.enabled);
-  }, [agent.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data: models } = useProviderModels(provider);
   // Show the price (USD per 1M in/out tokens) in the label when the provider

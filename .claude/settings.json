@@ -1,0 +1,77 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -m 8 -o /dev/null -w \"client: %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(node -e ' *)",
+      "Bash(curl -s -m 5 \"http://localhost:3001/pulls/6ae7d9f8-35d5-4798-ae2d-86901672f586/reviews\")",
+      "Bash(node node_modules/.bin/tsx src/db/seed.ts)",
+      "Bash(curl -s -m 5 \"http://localhost:3001/pulls/6ae7d9f8-35d5-4798-ae2d-86901672f586/runs\")",
+      "Bash(kill 97392)",
+      "Bash(node node_modules/.bin/vitest run resilience)",
+      "Bash(kill 20466)",
+      "Bash(nohup node node_modules/.bin/tsx watch src/server.ts > /tmp/devdigest-server.log 2>&1 & *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(gh repo *)",
+      "Bash(gh pr *)",
+      "Edit(/.claude/skills/react-ui-architecture/**)",
+      "Bash(echo \"exit: $?\")",
+      "Edit(/.claude/skills/onion-architecture/**)",
+      "Bash(pnpm typecheck *)",
+      "Bash(corepack --version)",
+      "Bash(npx pnpm *)",
+      "Read(//usr/local/bin/**)",
+      "Read(//opt/homebrew/bin/**)",
+      "Bash(brew list *)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(node_modules/.bin/vitest run *)",
+      "Bash(mkdir -p \"/Users/nickbarban-proxet/tutorspace/dev-digest/client/src/app/repos/[repoId]/pulls/_components/PullsListView\")",
+      "Bash(mkdir -p \"/Users/nickbarban-proxet/tutorspace/dev-digest/client/src/app/repos/[repoId]/pulls/[number]/_components/PrDetailView\")",
+      "Bash(mkdir -p \"/Users/nickbarban-proxet/tutorspace/dev-digest/client/src/app/agents/[id]/_components/AgentDetailView\")",
+      "Bash(git mv *)",
+      "Bash(timeout 180 node_modules/.bin/next build)",
+      "Bash(node_modules/.bin/next build *)",
+      "Bash(find / -maxdepth 8 -iname \"SKILL.md\" -path \"*code-review*\")",
+      "Bash(find / -maxdepth 8 -iname \"SKILL.md\" -path \"*security-review*\")",
+      "Bash(find / -maxdepth 6 -type d -iname \"skills\")",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(mkdir -p /Users/nickbarban-proxet/tutorspace/dev-digest/.claude/skills/pr-self-review/scripts)",
+      "Bash(git -C /Users/nickbarban-proxet/tutorspace/dev-digest rev-parse --abbrev-ref --symbolic-full-name '@{u}')",
+      "Bash(git -C /Users/nickbarban-proxet/tutorspace/dev-digest branch -vv)",
+      "Edit(/.claude/skills/pr-self-review/**)",
+      "Bash(chmod +x .claude/skills/pr-self-review/scripts/*.sh)",
+      "Bash(.claude/skills/pr-self-review/scripts/diff-hash.sh)",
+      "Bash(.claude/skills/pr-self-review/scripts/changed-files.sh)",
+      "Bash(.claude/skills/pr-self-review/scripts/diff-hash.sh origin/main)",
+      "Bash(bash -x .claude/skills/pr-self-review/scripts/diff-hash.sh)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(echo \"EXIT=$?\")",
+      "Read(//tmp/**)",
+      "Bash(set -e)",
+      "Bash(.claude/skills/pr-self-review/scripts/collect-diff.sh)",
+      "Bash(rm -f /tmp/claude-hook-check.txt /Users/nickbarban-proxet/tutorspace/dev-digest/.claude/.pr-self-review-receipt.json *)"
+    ],
+    "additionalDirectories": [
+      "/private/tmp",
+      "/Users/nickbarban-proxet/tutorspace/dev-digest/client/src/app/repos/[repoId]/pulls/_components",
+      "/Users/nickbarban-proxet/tutorspace/dev-digest/client/src/app/repos/[repoId]/pulls/[number]/_components",
+      "/Users/nickbarban-proxet/tutorspace/dev-digest/client/src/app/agents/[id]/_components"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/skills/pr-self-review/scripts/gate.sh",
+            "timeout": 15,
+            "statusMessage": "pr-self-review: checking gh pr create gate..."
+          }
+        ]
+      }
+    ]
+  }
+}

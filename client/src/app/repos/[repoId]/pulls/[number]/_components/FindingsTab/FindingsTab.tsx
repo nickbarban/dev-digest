@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Icon, Badge, Button, SectionLabel, EmptyState, type Severity } from "@devdigest/ui";
 import { RunStatus } from "../RunStatus";
-import { RunHistory } from "../RunHistory/RunHistory";
+import { RunHistory } from "../RunHistory";
 import { ReviewRunAccordion } from "../ReviewRunAccordion";
 import { SeverityFilterBar } from "../SeverityFilterBar";
 import { s } from "./styles";
@@ -42,6 +43,7 @@ export function FindingsTab({
   onDelete,
   onRunDone,
 }: FindingsTabProps) {
+  const t = useTranslations("prReview");
   const handleCancelAll = useCallback(() => {
     liveRunIds.forEach((id) => cancelMutation.mutate(id));
   }, [liveRunIds, cancelMutation]);
@@ -49,20 +51,6 @@ export function FindingsTab({
   const handleOpenFirstTrace = useCallback(() => {
     if (liveRunIds[0]) onOpenTrace(liveRunIds[0]);
   }, [liveRunIds, onOpenTrace]);
-
-  const handleOpenTrace = useCallback(
-    (id: string) => {
-      onOpenTrace(id);
-    },
-    [onOpenTrace],
-  );
-
-  const handleDelete = useCallback(
-    (id: string) => {
-      onDelete(id);
-    },
-    [onDelete],
-  );
 
   // Timeline → Review-runs navigation: clicking an agent name in the timeline
   // opens + scrolls to that run's accordion below. The nonce re-triggers the
@@ -106,15 +94,15 @@ export function FindingsTab({
                   loading={cancelMutation.isPending}
                   onClick={handleCancelAll}
                 >
-                  Cancel
+                  {t("findingsTab.cancel")}
                 </Button>
                 <Button kind="ghost" size="sm" icon="FileText" onClick={handleOpenFirstTrace}>
-                  Open run trace
+                  {t("findingsTab.openRunTrace")}
                 </Button>
               </div>
             }
           >
-            Live review
+            {t("findingsTab.liveReview")}
           </SectionLabel>
           <RunStatus runIds={liveRunIds} onDone={onRunDone} />
         </div>
@@ -123,19 +111,17 @@ export function FindingsTab({
       {reviewRunning && (
         <div style={s.reviewInProgress}>
           <Icon.RefreshCw size={16} style={{ color: "var(--accent)", animation: "ddspin 1s linear infinite" }} />
-          <span style={s.reviewInProgressText}>Review in progress…</span>
-          <span style={s.reviewInProgressSub}>
-            the agent is analyzing the diff — this can take a while on large PRs.
-          </span>
+          <span style={s.reviewInProgressText}>{t("findingsTab.reviewInProgress")}</span>
+          <span style={s.reviewInProgressSub}>{t("findingsTab.reviewInProgressSub")}</span>
         </div>
       )}
 
       {lethalTrifecta.length > 0 && (
         <div style={s.lethalTrifecta}>
           <Icon.Shield size={16} style={{ color: "var(--crit)" }} />
-          <span style={s.lethalTrifectaTitle}>Lethal Trifecta detected</span>
+          <span style={s.lethalTrifectaTitle}>{t("findingsTab.lethalTrifectaDetected")}</span>
           <Badge color="var(--crit)" bg="transparent">
-            {lethalTrifecta.length} finding(s)
+            {t("runStatus.findings", { count: lethalTrifecta.length })}
           </Badge>
         </div>
       )}
@@ -144,9 +130,9 @@ export function FindingsTab({
         <div style={s.timelineSection}>
           <SectionLabel
             icon="Activity"
-            right={<span style={{ fontSize: 12, color: "var(--text-muted)" }}>runs &amp; commits · newest first</span>}
+            right={<span style={{ fontSize: 12, color: "var(--text-muted)" }}>{t("findingsTab.timelineSubtitle")}</span>}
           >
-            Timeline
+            {t("findingsTab.timeline")}
           </SectionLabel>
           <RunHistory
             runs={prRuns ?? []}
@@ -154,18 +140,18 @@ export function FindingsTab({
             findingsByRunId={findingsByRunId}
             repoFullName={repoFullName}
             headSha={headSha}
-            onOpenTrace={handleOpenTrace}
+            onOpenTrace={onOpenTrace}
             onGoToReview={handleGoToReview}
-            onDelete={handleDelete}
+            onDelete={onDelete}
           />
         </div>
       )}
 
       <SectionLabel
         icon="AlertOctagon"
-        right={<span style={{ fontSize: 12, color: "var(--text-muted)" }}>grouped by run · newest first</span>}
+        right={<span style={{ fontSize: 12, color: "var(--text-muted)" }}>{t("findingsTab.reviewRunsSubtitle")}</span>}
       >
-        Review runs
+        {t("findingsTab.reviewRuns")}
       </SectionLabel>
       {runs.length > 0 && (
         <SeverityFilterBar
@@ -178,15 +164,15 @@ export function FindingsTab({
         reviewRunning || liveRunIds.length > 0 ? null : (
           <EmptyState
             icon="Sparkles"
-            title="No findings yet"
-            body="Run a review to generate findings. Use Run Review ▾ above (run all enabled agents or a specific one)."
+            title={t("findingsTab.emptyTitle")}
+            body={t("findingsTab.emptyBody")}
           />
         )
       ) : visibleRuns.length === 0 ? (
         <EmptyState
           icon="Filter"
-          title={`No ${activeSeverity?.toLowerCase()} findings`}
-          body="Click the severity again to clear the filter."
+          title={t("findingsTab.noSeverityFindingsTitle", { severity: activeSeverity?.toLowerCase() ?? "" })}
+          body={t("findingsTab.noSeverityFindingsBody")}
         />
       ) : (
         prId &&
